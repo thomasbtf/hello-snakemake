@@ -2,6 +2,7 @@ import pandas as pd
 import urllib.parse
 import urllib.request
 import time
+from typing import List
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst.
@@ -13,7 +14,7 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def map_db_identifiers(from_id:str, to_id:str, query:list[str], verbose:bool = True) -> pd.DataFrame:
+def map_db_identifiers(from_id:str, to_id:str, query:List[str], verbose:bool = True) -> pd.DataFrame:
     """Querys the UniProt Retrieve/ID mapping servies to map database identifiers. Converts identifiers 
     which are of a different type to UniProt identifiers or vice versa and returns the identifier lists. 
     See https://www.uniprot.org/help/api_idmapping for further information.
@@ -94,7 +95,7 @@ def get_kegg_annotations(data_path, out_path):
     ]   
 
     # Load identified proteins
-    data_df = pd.read_csv( data_path + 'output.csv', names = diamond_headers)
+    data_df = pd.read_csv(data_path, names = diamond_headers)
     data_df['Target'] = data_df['Target accession'].str.extract(r'(.*(?=\.))')
 
     # Get KEGG IDs with UniProt Retrieve/ID mapping
@@ -114,6 +115,6 @@ def get_kegg_annotations(data_path, out_path):
     data_df = data_df.merge(grouped_keg, how='left', left_on='Target', right_on='From', validate='m:1')
     data_df.drop(columns=['From_x', 'From_y'], inplace=True)
 
-    data_df.to_csv(out_path + 'out.csv', index=False)
+    data_df.to_csv(out_path, index=False)
 
 get_kegg_annotations(snakemake.input[0], snakemake.output[0])

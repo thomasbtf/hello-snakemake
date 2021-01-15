@@ -36,6 +36,7 @@ rule transform_tsv_to_csv:
     shell:
         "sed 's/\t/,/g' {input} > {output}"
 
+# annotate founde genes with KEGG codes
 rule get_KEGG:
     input:
         'resources/output.csv'

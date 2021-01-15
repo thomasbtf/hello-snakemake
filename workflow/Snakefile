@@ -32,6 +32,14 @@ rule transform_tsv_to_csv:
     input:
         'resources/output.tsv'
     output:
-        'results/output.csv'
+        'resources/output.csv'
     shell:
         "sed 's/\t/,/g' {input} > {output}"
+
+rule get_KEGG:
+    input:
+        'resources/output.csv'
+    output:
+        'results/output.csv'
+    script:
+        'scripts/KEGG.py'

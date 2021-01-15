@@ -1,0 +1,37 @@
+# load config file. Mainly for diamonds blastx sensitivity
+configfile: "config/config.yaml"
+
+# When all is done
+rule done:
+    input:
+        'results/output.csv'
+    shell:
+        'echo Pipiline complete!'
+
+# transform fasta DB to diamond format
+rule transform_fastaDB_to_diamondDB:
+    input:
+        'input/swissprot'
+    output:
+        'resources/swissprotDiamondDB.dmnd'
+    shell:
+        'diamond makedb --in {input} -d {output}'
+
+# use blastx with DNA genome data on formated protein DB
+rule use_diamonds_blastx:
+    input:
+        diamond_db = 'resources/swissprotDiamondDB.dmnd',
+        genome = 'input/U00096.2.fasta'
+    output:
+        'resources/output.tsv'
+    shell:
+        "diamond blastx -q {input.genome} -d {input.diamond_db} -o {output} {config[sensitivity]} --verbose -k0 --salltitles"
+
+# change tsv to csv
+rule transform_tsv_to_csv:
+    input:
+        'resources/output.tsv'
+    output:
+        'results/output.csv'
+    shell:
+        "sed 's/\t/,/g' {input} > {output}"

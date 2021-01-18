@@ -4,8 +4,12 @@ import urllib.request
 import time
 from typing import List
 
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst.
+def chunks(lst:list, n:int):
+    """Yield successive n-sized chunks from list.
+
+    Args:
+        lst (list): Orignal list, that shall be chunked
+        n (int): Size of chunks
 
     Yields:
         list: n-sized chunks from lst
@@ -20,13 +24,16 @@ def map_db_identifiers(from_id:str, to_id:str, query:List[str], verbose:bool = T
     See https://www.uniprot.org/help/api_idmapping for further information.
     Alternativly load the mapping data directly from ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping (~19.5 GB).
     Very large mapping requests (>50,000 identifiers) are likely to fail. Please do verify that your list does not contain any duplicates.
-     Very large mapping requests are split it into smaller chunks (<20,000 identifiers). 
+    Very large mapping requests are split it into smaller chunks (<20,000 identifiers). 
 
     Args:
-        params ([type]): [description]
+        from_id (str): Original identifier
+        to_id (str): Target identifier
+        query (List[str]): Identifiers to be mapped
+        verbose (bool, optional): Verbose mode. Provides additional details. Defaults to True.
 
     Returns:
-        [type]: [description]
+        pd.DataFrame: [description]
     """
 
     url = 'https://www.uniprot.org/uploadlists/'
@@ -75,7 +82,7 @@ def map_db_identifiers(from_id:str, to_id:str, query:List[str], verbose:bool = T
         temp_df.drop(temp_df.index[-1], inplace=True)
         return_df = return_df.append(temp_df, ignore_index=True)
         iterationCount += 1
-    
+
     return return_df.drop_duplicates()
 
 def get_kegg_annotations(data_path, out_path):

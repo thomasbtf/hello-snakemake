@@ -1,3 +1,4 @@
 *.snakemake
 *.vscode
 docker run.txt
+/cache

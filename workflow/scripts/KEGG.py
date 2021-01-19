@@ -23,8 +23,10 @@ def map_db_identifiers(from_id:str, to_id:str, query:List[str], verbose:bool = T
     which are of a different type to UniProt identifiers or vice versa and returns the identifier as a DataFrame. 
 
     See https://www.uniprot.org/help/api_idmapping for further information.
-    Alternativly load the mapping data directly from ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping (~19.5 GB).
-    Very large mapping requests are split it into smaller chunks (<=20,000 identifiers), since very large mapping requests (>50,000 identifiers) are likely to fail. 
+    Alternativly load the mapping data directly from:
+    ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping (~19.5 GB).
+    Very large mapping requests are split it into smaller chunks (<=20,000 identifiers), 
+    since very large mapping requests (>50,000 identifiers) are likely to fail. 
 
     Args:
         from_id (str): Original database identifier, e.g. 'ACC+ID'

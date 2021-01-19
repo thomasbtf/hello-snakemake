@@ -1,8 +1,8 @@
+from typing import List
 import pandas as pd
 import urllib.parse
 import urllib.request
 import time
-from typing import List
 
 def chunks(lst:list, n:int):
     """Yield successive n-sized chunks from list.
@@ -19,26 +19,29 @@ def chunks(lst:list, n:int):
         yield lst[i:i + n]
 
 def map_db_identifiers(from_id:str, to_id:str, query:List[str], verbose:bool = True) -> pd.DataFrame:
-    """Querys the UniProt Retrieve/ID mapping servies to map database identifiers. Converts identifiers 
-    which are of a different type to UniProt identifiers or vice versa and returns the identifier lists. 
+    """Querys UniProts Retrieve/ID mapping service to map database identifiers. Converts identifiers 
+    which are of a different type to UniProt identifiers or vice versa and returns the identifier as a DataFrame. 
+
     See https://www.uniprot.org/help/api_idmapping for further information.
     Alternativly load the mapping data directly from ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping (~19.5 GB).
-    Very large mapping requests (>50,000 identifiers) are likely to fail. Please do verify that your list does not contain any duplicates.
-    Very large mapping requests are split it into smaller chunks (<20,000 identifiers). 
+    Very large mapping requests are split it into smaller chunks (<=20,000 identifiers), since very large mapping requests (>50,000 identifiers) are likely to fail. 
 
     Args:
-        from_id (str): Original identifier
-        to_id (str): Target identifier
-        query (List[str]): Identifiers to be mapped
+        from_id (str): Original database identifier, e.g. 'ACC+ID'
+        to_id (str): Target database identifier, e.g. 'KEGG'
+        query (List[str]): Identifiers in a List as string to be mapped, e.g. ['P76347', 'Q8X8V7']
         verbose (bool, optional): Verbose mode. Provides additional details. Defaults to True.
 
     Returns:
-        pd.DataFrame: [description]
+        pd.DataFrame: Orignal identifier with corresponing identifiers.
     """
 
     url = 'https://www.uniprot.org/uploadlists/'
     return_df = pd.DataFrame()
     chunk_size = 20000
+
+    # remove duplicates
+    query = list(set(query))
 
     # chunk list if to large
     iterationCount = 1
@@ -57,7 +60,7 @@ def map_db_identifiers(from_id:str, to_id:str, query:List[str], verbose:bool = T
         data = urllib.parse.urlencode(params)
         data = data.encode('utf-8')
 
-        # # create request object and read it
+        # create request object and read it
         if verbose:
             print('Querying chunk %s/%s' %(iterationCount, len_gen))
         request = urllib.request.Request(url, data)
